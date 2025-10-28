@@ -1,0 +1,331 @@
+╔══════════════════════════════════════════════════════════════════════════════════╗
+║                     DIAGRAMA DE ARQUITECTURA DEL PROYECTO JPA                   ║
+╚══════════════════════════════════════════════════════════════════════════════════╝
+
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                              CAPA DE PRESENTACIÓN                               │
+│                           (Consola H2 / APIs REST)                              │
+└──────────────────────────────┬──────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                          CAPA DE REPOSITORIOS (JPA)                             │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  ┌──────────────────┐  ┌──────────────────┐  ┌──────────────────┐             │
+│  │ CategoryRepo     │  │ ProductRepo      │  │ CustomerRepo     │             │
+│  │ • findByName()   │  │ • findByCategory │  │ • findByEmail()  │             │
+│  │ • existsByName() │  │ • findByPrice()  │  │ • findByStatus() │             │
+│  └──────────────────┘  └──────────────────┘  └──────────────────┘             │
+│                                                                                 │
+│  ┌──────────────────┐  ┌──────────────────┐                                   │
+│  │ OrderRepo        │  │ OrderItemRepo    │                                   │
+│  │ • findByCustomer │  │ • findByOrder()  │                                   │
+│  │ • findByStatus() │  │ • findByProduct()│                                   │
+│  └──────────────────┘  └──────────────────┘                                   │
+│                                                                                 │
+└──────────────────────────────┬──────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                          CAPA DE ENTIDADES (JPA)                                │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  ┌────────────────────────────────────────────────────────────────────┐        │
+│  │                         Category                                   │        │
+│  │  ─────────────────────────────────────────────────────────         │        │
+│  │  + id: Long                                                         │        │
+│  │  + name: String                                                     │        │
+│  │  + description: String                                              │        │
+│  │  + products: List<Product>  [@OneToMany]                            │        │
+│  └────────────────────────────┬───────────────────────────────────────┘        │
+│                                │                                                │
+│                                │ 1:N                                            │
+│                                ▼                                                │
+│  ┌────────────────────────────────────────────────────────────────────┐        │
+│  │                         Product                                    │        │
+│  │  ─────────────────────────────────────────────────────────         │        │
+│  │  + id: Long                                                         │        │
+│  │  + name: String                                                     │        │
+│  │  + description: String                                              │        │
+│  │  + price: BigDecimal                                                │        │
+│  │  + stock: Integer                                                   │        │
+│  │  + createdAt: LocalDateTime                                         │        │
+│  │  + updatedAt: LocalDateTime                                         │        │
+│  │  + category: Category  [@ManyToOne]                                 │        │
+│  └─────────────────────────────────────────────────────────────────────┘       │
+│                                                                                 │
+│  ┌────────────────────────────────────────────────────────────────────┐        │
+│  │                         Customer                                   │        │
+│  │  ─────────────────────────────────────────────────────────         │        │
+│  │  + id: Long                                                         │        │
+│  │  + firstName: String                                                │        │
+│  │  + lastName: String                                                 │        │
+│  │  + email: String  (unique)                                          │        │
+│  │  + phone: String                                                    │        │
+│  │  + address: String                                                  │        │
+│  │  + birthDate: LocalDate                                             │        │
+│  │  + registrationDate: LocalDate                                      │        │
+│  │  + status: CustomerStatus  (enum)                                   │        │
+│  │  + orders: List<Order>  [@OneToMany]                                │        │
+│  └────────────────────────────┬───────────────────────────────────────┘        │
+│                                │                                                │
+│                                │ 1:N                                            │
+│                                ▼                                                │
+│  ┌────────────────────────────────────────────────────────────────────┐        │
+│  │                           Order                                    │        │
+│  │  ─────────────────────────────────────────────────────────         │        │
+│  │  + id: Long                                                         │        │
+│  │  + orderNumber: String  (unique)                                    │        │
+│  │  + orderDate: LocalDateTime                                         │        │
+│  │  + status: OrderStatus  (enum)                                      │        │
+│  │  + totalAmount: BigDecimal                                          │        │
+│  │  + shippingAddress: String                                          │        │
+│  │  + notes: String                                                    │        │
+│  │  + customer: Customer  [@ManyToOne]                                 │        │
+│  │  + orderItems: List<OrderItem>  [@OneToMany]                        │        │
+│  └────────────────────────────┬───────────────────────────────────────┘        │
+│                                │                                                │
+│                                │ 1:N                                            │
+│                                ▼                                                │
+│  ┌────────────────────────────────────────────────────────────────────┐        │
+│  │                        OrderItem                                   │        │
+│  │  ─────────────────────────────────────────────────────────         │        │
+│  │  + id: Long                                                         │        │
+│  │  + quantity: Integer                                                │        │
+│  │  + unitPrice: BigDecimal                                            │        │
+│  │  + subtotal: BigDecimal  (calculado)                                │        │
+│  │  + order: Order  [@ManyToOne]                                       │        │
+│  │  + product: Product  [@ManyToOne]                                   │        │
+│  └─────────────────────────────────────────────────────────────────────┘       │
+│                                                                                 │
+└──────────────────────────────┬──────────────────────────────────────────────────┘
+                               │
+                               ▼
+┌─────────────────────────────────────────────────────────────────────────────────┐
+│                           CAPA DE PERSISTENCIA                                  │
+│                        (Hibernate + Base de Datos)                              │
+├─────────────────────────────────────────────────────────────────────────────────┤
+│                                                                                 │
+│  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
+│  │ categories  │  │  products   │  │  customers  │  │   orders    │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘  └─────────────┘          │
+│                                                                                 │
+│  ┌─────────────┐                                                               │
+│  │ order_items │                                                               │
+│  └─────────────┘                                                               │
+│                                                                                 │
+│  Base de Datos: H2 (desarrollo) / MySQL (producción)                           │
+│                                                                                 │
+└─────────────────────────────────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════════╗
+║                          DIAGRAMA DE RELACIONES                                  ║
+╚══════════════════════════════════════════════════════════════════════════════════╝
+
+                              ┌─────────────┐
+                              │  Category   │
+                              │─────────────│
+                              │ id          │
+                              │ name        │
+                              │ description │
+                              └──────┬──────┘
+                                     │
+                                     │ 1
+                                     │
+                                     │ @OneToMany
+                                     │
+                                     │ N
+                                     │
+                              ┌──────▼──────┐
+                              │   Product   │
+                              │─────────────│
+                              │ id          │
+                              │ name        │
+                              │ price       │
+                              │ stock       │
+                              │ category_id │ @ManyToOne
+                              └─────────────┘
+
+
+┌─────────────┐                            ┌─────────────┐
+│  Customer   │                            │    Order    │
+│─────────────│                            │─────────────│
+│ id          │                            │ id          │
+│ firstName   │                            │ orderNumber │
+│ lastName    │         1         N        │ orderDate   │
+│ email       │◄───────────────────────────│ status      │
+│ status      │      @OneToMany            │ totalAmount │
+└─────────────┘         │                  │ customer_id │ @ManyToOne
+                        │                  └──────┬──────┘
+                        │                         │
+                        │                         │ 1
+                        │                         │
+                        │                         │ @OneToMany
+                        │                         │
+                        │                         │ N
+                        │                         │
+                        │                  ┌──────▼──────┐
+                        │                  │  OrderItem  │
+                        │                  │─────────────│
+                        │                  │ id          │
+                        │                  │ quantity    │
+                        │                  │ unitPrice   │
+                        │                  │ subtotal    │
+                        │                  │ order_id    │ @ManyToOne
+                        │                  │ product_id  │ @ManyToOne
+                        │                  └──────┬──────┘
+                        │                         │
+                        │                         │ N
+                        │                         │
+                        │                         │
+                        │                         │ 1
+                        │                         │
+                        │                  ┌──────▼──────┐
+                        │                  │   Product   │
+                        │                  │─────────────│
+                        │                  │ id          │
+                        │                  │ name        │
+                        │                  │ price       │
+                        │                  └─────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════════╗
+║                        FLUJO DE DATOS - EJEMPLO                                  ║
+╚══════════════════════════════════════════════════════════════════════════════════╝
+
+1. Usuario accede a la aplicación
+   └─> Spring Boot inicia
+
+2. Spring carga configuración
+   └─> application.properties
+   └─> Configura DataSource (H2)
+
+3. Hibernate crea EntityManagerFactory
+   └─> Lee anotaciones JPA de las entidades
+   └─> Configura mapeo objeto-relacional
+
+4. Spring ejecuta scripts SQL
+   └─> schema.sql (crea tablas)
+   └─> data.sql (inserta datos)
+
+5. Aplicación lista para usar
+   └─> Repositorios disponibles
+   └─> EntityManager gestiona operaciones
+
+6. Operación de ejemplo: Buscar productos
+   │
+   ├─> Controller/Service llama a ProductRepository
+   │   └─> productRepository.findByCategoryId(1L)
+   │
+   ├─> Spring Data JPA traduce a JPQL
+   │   └─> SELECT p FROM Product p WHERE p.category.id = :categoryId
+   │
+   ├─> Hibernate traduce a SQL
+   │   └─> SELECT * FROM products WHERE category_id = 1
+   │
+   ├─> JDBC ejecuta la consulta
+   │   └─> ResultSet con los datos
+   │
+   └─> Hibernate mapea ResultSet a objetos Product
+       └─> Retorna List<Product> al caller
+
+
+╔══════════════════════════════════════════════════════════════════════════════════╗
+║                      ESTRUCTURA DE ARCHIVOS DEL PROYECTO                         ║
+╚══════════════════════════════════════════════════════════════════════════════════╝
+
+primera-entrega-java/
+│
+├── pom.xml                                    ← Dependencias Maven
+├── .gitignore                                 ← Archivos ignorados por Git
+│
+├── README.md                                  ← Documentación principal
+├── CONCEPTOS_JPA.md                           ← Guía de conceptos JPA
+├── INSTRUCCIONES_EJECUCION.md                 ← Cómo ejecutar el proyecto
+├── DIAGRAMA_PROYECTO.txt                      ← Este archivo
+│
+└── src/
+    │
+    ├── main/
+    │   │
+    │   ├── java/
+    │   │   └── com/
+    │   │       └── proyecto/
+    │   │           └── jpa/
+    │   │               │
+    │   │               ├── PrimeraEntregaJpaApplication.java  ← Clase principal
+    │   │               │
+    │   │               ├── entity/                ← Entidades JPA
+    │   │               │   ├── Category.java
+    │   │               │   ├── Product.java
+    │   │               │   ├── Customer.java
+    │   │               │   ├── Order.java
+    │   │               │   └── OrderItem.java
+    │   │               │
+    │   │               └── repository/            ← Repositorios
+    │   │                   ├── CategoryRepository.java
+    │   │                   ├── ProductRepository.java
+    │   │                   ├── CustomerRepository.java
+    │   │                   ├── OrderRepository.java
+    │   │                   └── OrderItemRepository.java
+    │   │
+    │   └── resources/
+    │       ├── application.properties             ← Configuración H2
+    │       ├── application-mysql.properties       ← Configuración MySQL
+    │       ├── schema.sql                         ← Script de estructura
+    │       └── data.sql                           ← Script de datos
+    │
+    └── test/                                      ← Tests (estructura básica)
+
+
+╔══════════════════════════════════════════════════════════════════════════════════╗
+║                         RESUMEN DE TECNOLOGÍAS                                   ║
+╚══════════════════════════════════════════════════════════════════════════════════╝
+
+┌────────────────────────┬──────────────────────────────────────────────────────┐
+│ Tecnología             │ Descripción                                          │
+├────────────────────────┼──────────────────────────────────────────────────────┤
+│ Java 17                │ Lenguaje de programación                             │
+│ Spring Boot 3.1.5      │ Framework para aplicaciones empresariales            │
+│ Spring Data JPA        │ Abstracción de persistencia sobre JPA                │
+│ Hibernate              │ Implementación de JPA (ORM)                          │
+│ H2 Database            │ Base de datos en memoria (desarrollo)                │
+│ MySQL                  │ Base de datos relacional (producción)                │
+│ Maven                  │ Gestión de dependencias y construcción               │
+│ Bean Validation        │ Validaciones declarativas (@NotBlank, @Email, etc.)  │
+│ Lombok (opcional)      │ Reducir código boilerplate                           │
+└────────────────────────┴──────────────────────────────────────────────────────┘
+
+
+╔══════════════════════════════════════════════════════════════════════════════════╗
+║                      CARACTERÍSTICAS IMPLEMENTADAS                               ║
+╚══════════════════════════════════════════════════════════════════════════════════╝
+
+✅ 5 Entidades JPA con anotaciones completas
+✅ Relaciones OneToMany, ManyToOne
+✅ Cascadas (CascadeType.ALL) y orphanRemoval
+✅ Fetch Types (LAZY y EAGER) configurados apropiadamente
+✅ Claves primarias con generación automática (IDENTITY)
+✅ Validaciones con Bean Validation (@NotBlank, @Email)
+✅ Enumeraciones para estados (CustomerStatus, OrderStatus)
+✅ Callbacks de ciclo de vida (@PrePersist, @PreUpdate)
+✅ Campos transitorios (@Transient)
+✅ Sincronización bidireccional con métodos helper
+✅ hashCode() y equals() implementados correctamente
+✅ 5 Repositorios JPA con consultas personalizadas
+✅ Query Methods (findByName, findByStatus, etc.)
+✅ Consultas JPQL personalizadas (@Query)
+✅ Consultas SQL nativas (nativeQuery = true)
+✅ Scripts SQL completos (schema.sql + data.sql)
+✅ Configuración para H2 y MySQL
+✅ Datos de prueba precargados
+✅ Documentación completa y detallada
+✅ Comentarios en el código explicativos
+
+
+═══════════════════════════════════════════════════════════════════════════════════
+                       FIN DEL DIAGRAMA DEL PROYECTO
+═══════════════════════════════════════════════════════════════════════════════════
+
