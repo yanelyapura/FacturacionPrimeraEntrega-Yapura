@@ -52,6 +52,7 @@ jobs:
       run: |
         cp index.html docs/
         cp api-demo.html docs/
+        cp demo.html docs/
         cp README.md docs/ || echo "README.md not found"
       
     - name: Copy Javadoc to docs

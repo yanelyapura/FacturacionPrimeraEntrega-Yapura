@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Demo Interactivo - Sistema de Facturación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .demo-container {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 2rem 0;
+        }
+        .demo-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .console-header {
+            background: #2c3e50;
+            color: white;
+            padding: 1rem;
+            border-radius: 10px 10px 0 0;
+            font-family: 'Courier New', monospace;
+        }
+        .console-body {
+            background: #1e1e1e;
+            color: #00ff00;
+            padding: 1.5rem;
+            font-family: 'Courier New', monospace;
+            min-height: 300px;
+            border-radius: 0 0 10px 10px;
+            overflow-y: auto;
+        }
+        .console-input {
+            background: transparent;
+            border: none;
+            color: #00ff00;
+            outline: none;
+            width: 100%;
+            font-family: 'Courier New', monospace;
+        }
+        .entity-card {
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            cursor: pointer;
+        }
+        .entity-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15);
+        }
+        .data-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        .status-badge {
+            font-size: 0.8rem;
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+        }
+        .api-endpoint {
+            background: #f8f9fa;
+            border-left: 4px solid #007bff;
+            padding: 1rem;
+            margin: 0.5rem 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .response-json {
+            background: #2d3748;
+            color: #e2e8f0;
+            padding: 1rem;
+            border-radius: 5px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9rem;
+            overflow-x: auto;
+        }
+    </style>
+</head>
+<body>
+    <div class="demo-container">
+        <div class="container">
+            <!-- Header -->
+            <div class="text-center mb-5">
+                <h1 class="text-white display-4 fw-bold mb-3">
+                    <i class="fas fa-database me-3"></i>Demo Interactivo
+                </h1>
+                <p class="text-white-50 fs-5">Simulación del Sistema de Facturación Empresarial</p>
+                <div class="d-flex justify-content-center gap-3 mt-4">
+                    <a href="index.html" class="btn btn-light btn-lg">
+                        <i class="fas fa-home me-2"></i>Inicio
+                    </a>
+                    <a href="api-demo.html" class="btn btn-outline-light btn-lg">
+                        <i class="fas fa-code me-2"></i>API Demo
+                    </a>
+                </div>
+            </div>
+
+            <!-- Console H2 Simulator -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <div class="demo-card">
+                        <div class="console-header">
+                            <div class="d-flex align-items-center">
+                                <i class="fas fa-terminal me-2"></i>
+                                <span class="fw-bold">H2 Database Console</span>
+                                <div class="ms-auto">
+                                    <span class="badge bg-success">Connected</span>
+                                    <span class="ms-2">jdbc:h2:mem:testdb</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="console-body" id="console">
+                            <div class="mb-3">
+                                <span class="text-success">H2 Console</span> - Connected to database
+                            </div>
+                            <div class="mb-3">
+                                <span class="text-info">JDBC URL:</span> jdbc:h2:mem:testdb
+                            </div>
+                            <div class="mb-3">
+                                <span class="text-info">User:</span> sa
+                            </div>
+                            <div class="mb-3">
+                                <span class="text-info">Password:</span> (empty)
+                            </div>
+                            <div class="mb-3">
+                                <span class="text-warning">Available Tables:</span>
+                            </div>
+                            <div class="ms-3 mb-2">
+                                <span class="text-success">✓</span> CATEGORIES
+                            </div>
+                            <div class="ms-3 mb-2">
+                                <span class="text-success">✓</span> PRODUCTS
+                            </div>
+                            <div class="ms-3 mb-2">
+                                <span class="text-success">✓</span> CUSTOMERS
+                            </div>
+                            <div class="ms-3 mb-2">
+                                <span class="text-success">✓</span> ORDERS
+                            </div>
+                            <div class="ms-3 mb-2">
+                                <span class="text-success">✓</span> ORDER_ITEMS
+                            </div>
+                            <div class="mt-4">
+                                <span class="text-primary">H2></span>
+                                <input type="text" class="console-input" id="sqlInput" placeholder="SELECT * FROM categories;" onkeypress="handleSQLInput(event)">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Entity Management -->
+            <div class="row mb-5">
+                <div class="col-12">
+                    <h2 class="text-white text-center mb-4">
+                        <i class="fas fa-cogs me-2"></i>Gestión de Entidades
+                    </h2>
+                </div>
+            </div>
+
+            <div class="row g-4 mb-5">
+                <!-- Categories -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="entity-card demo-card p-4" onclick="showEntityData('categories')">
+                        <div class="text-center">
+                            <i class="fas fa-tags fa-3x text-primary mb-3"></i>
+                            <h5 class="fw-bold">Categorías</h5>
+                            <p class="text-muted">Gestión de categorías de productos</p>
+                            <span class="badge bg-primary">5 registros</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Products -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="entity-card demo-card p-4" onclick="showEntityData('products')">
+                        <div class="text-center">
+                            <i class="fas fa-box fa-3x text-success mb-3"></i>
+                            <h5 class="fw-bold">Productos</h5>
+                            <p class="text-muted">Catálogo de productos</p>
+                            <span class="badge bg-success">12 registros</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Customers -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="entity-card demo-card p-4" onclick="showEntityData('customers')">
+                        <div class="text-center">
+                            <i class="fas fa-users fa-3x text-info mb-3"></i>
+                            <h5 class="fw-bold">Clientes</h5>
+                            <p class="text-muted">Registro de clientes</p>
+                            <span class="badge bg-info">8 registros</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Orders -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="entity-card demo-card p-4" onclick="showEntityData('orders')">
+                        <div class="text-center">
+                            <i class="fas fa-shopping-cart fa-3x text-warning mb-3"></i>
+                            <h5 class="fw-bold">Pedidos</h5>
+                            <p class="text-muted">Sistema de pedidos</p>
+                            <span class="badge bg-warning">15 registros</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Order Items -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="entity-card demo-card p-4" onclick="showEntityData('orderItems')">
+                        <div class="text-center">
+                            <i class="fas fa-list fa-3x text-danger mb-3"></i>
+                            <h5 class="fw-bold">Items de Pedido</h5>
+                            <p class="text-muted">Detalle de productos en pedidos</p>
+                            <span class="badge bg-danger">45 registros</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- API Endpoints -->
+                <div class="col-lg-4 col-md-6">
+                    <div class="entity-card demo-card p-4" onclick="showAPIEndpoints()">
+                        <div class="text-center">
+                            <i class="fas fa-code fa-3x text-secondary mb-3"></i>
+                            <h5 class="fw-bold">API Endpoints</h5>
+                            <p class="text-muted">Documentación de APIs REST</p>
+                            <span class="badge bg-secondary">8 endpoints</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Data Display Area -->
+            <div class="row" id="dataDisplayArea" style="display: none;">
+                <div class="col-12">
+                    <div class="demo-card p-4">
+                        <div class="d-flex justify-content-between align-items-center mb-4">
+                            <h4 id="dataTitle" class="mb-0"></h4>
+                            <button class="btn btn-outline-secondary" onclick="hideDataDisplay()">
+                                <i class="fas fa-times"></i>
+                            </button>
+                        </div>
+                        <div id="dataContent"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Sample data
+        const sampleData = {
+            categories: [
+                { id: 1, name: "Tecnología", description: "Productos tecnológicos y electrónicos" },
+                { id: 2, name: "Hogar", description: "Artículos para el hogar" },
+                { id: 3, name: "Deportes", description: "Equipos y accesorios deportivos" },
+                { id: 4, name: "Libros", description: "Libros y material educativo" },
+                { id: 5, name: "Ropa", description: "Vestimenta y accesorios" }
+            ],
+            products: [
+                { id: 1, name: "Laptop Gaming", price: 1299.99, stock: 10, category: "Tecnología" },
+                { id: 2, name: "Smartphone", price: 599.99, stock: 25, category: "Tecnología" },
+                { id: 3, name: "Mesa de Oficina", price: 299.99, stock: 5, category: "Hogar" },
+                { id: 4, name: "Pelota de Fútbol", price: 29.99, stock: 50, category: "Deportes" },
+                { id: 5, name: "Libro de Programación", price: 49.99, stock: 30, category: "Libros" }
+            ],
+            customers: [
+                { id: 1, firstName: "Juan", lastName: "Pérez", email: "juan@email.com", status: "ACTIVE" },
+                { id: 2, firstName: "María", lastName: "García", email: "maria@email.com", status: "ACTIVE" },
+                { id: 3, firstName: "Carlos", lastName: "López", email: "carlos@email.com", status: "INACTIVE" },
+                { id: 4, firstName: "Ana", lastName: "Martínez", email: "ana@email.com", status: "ACTIVE" }
+            ],
+            orders: [
+                { id: 1, orderNumber: "ORD-001", customer: "Juan Pérez", status: "PENDING", total: 1899.98, date: "2025-01-15" },
+                { id: 2, orderNumber: "ORD-002", customer: "María García", status: "PROCESSING", total: 599.99, date: "2025-01-14" },
+                { id: 3, orderNumber: "ORD-003", customer: "Ana Martínez", status: "DELIVERED", total: 329.98, date: "2025-01-13" }
+            ],
+            orderItems: [
+                { id: 1, orderNumber: "ORD-001", product: "Laptop Gaming", quantity: 1, unitPrice: 1299.99, subtotal: 1299.99 },
+                { id: 2, orderNumber: "ORD-001", product: "Smartphone", quantity: 1, unitPrice: 599.99, subtotal: 599.99 },
+                { id: 3, orderNumber: "ORD-002", product: "Smartphone", quantity: 1, unitPrice: 599.99, subtotal: 599.99 }
+            ]
+        };
+
+        const apiEndpoints = [
+            { method: "GET", endpoint: "/api/categories", description: "Obtener todas las categorías" },
+            { method: "GET", endpoint: "/api/products", description: "Obtener todos los productos" },
+            { method: "GET", endpoint: "/api/customers", description: "Obtener todos los clientes" },
+            { method: "GET", endpoint: "/api/orders", description: "Obtener todos los pedidos" },
+            { method: "POST", endpoint: "/api/orders", description: "Crear un nuevo pedido" },
+            { method: "GET", endpoint: "/api/products/search", description: "Buscar productos con filtros" },
+            { method: "PUT", endpoint: "/api/products/{id}", description: "Actualizar un producto" },
+            { method: "DELETE", endpoint: "/api/orders/{id}", description: "Eliminar un pedido" }
+        ];
+
+        function handleSQLInput(event) {
+            if (event.key === 'Enter') {
+                const input = event.target.value;
+                if (input.trim()) {
+                    executeSQL(input);
+                    event.target.value = '';
+                }
+            }
+        }
+
+        function executeSQL(sql) {
+            const console = document.getElementById('console');
+            const newLine = document.createElement('div');
+            newLine.className = 'mb-2';
+            newLine.innerHTML = `<span class="text-primary">H2></span> ${sql}`;
+            console.appendChild(newLine);
+
+            // Simulate SQL execution
+            setTimeout(() => {
+                const resultLine = document.createElement('div');
+                resultLine.className = 'mb-2 text-success';
+                resultLine.innerHTML = `✓ Query executed successfully (${Math.floor(Math.random() * 10) + 1} rows affected)`;
+                console.appendChild(resultLine);
+                console.scrollTop = console.scrollHeight;
+            }, 500);
+        }
+
+        function showEntityData(entityType) {
+            const dataDisplayArea = document.getElementById('dataDisplayArea');
+            const dataTitle = document.getElementById('dataTitle');
+            const dataContent = document.getElementById('dataContent');
+
+            dataTitle.innerHTML = `<i class="fas fa-table me-2"></i>${getEntityTitle(entityType)}`;
+            
+            const data = sampleData[entityType];
+            let html = '';
+
+            if (entityType === 'categories') {
+                html = createTable(data, ['ID', 'Nombre', 'Descripción']);
+            } else if (entityType === 'products') {
+                html = createTable(data, ['ID', 'Nombre', 'Precio', 'Stock', 'Categoría']);
+            } else if (entityType === 'customers') {
+                html = createTable(data, ['ID', 'Nombre', 'Apellido', 'Email', 'Estado']);
+            } else if (entityType === 'orders') {
+                html = createTable(data, ['ID', 'Número', 'Cliente', 'Estado', 'Total', 'Fecha']);
+            } else if (entityType === 'orderItems') {
+                html = createTable(data, ['ID', 'Pedido', 'Producto', 'Cantidad', 'Precio Unit.', 'Subtotal']);
+            }
+
+            dataContent.innerHTML = html;
+            dataDisplayArea.style.display = 'block';
+            dataDisplayArea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function showAPIEndpoints() {
+            const dataDisplayArea = document.getElementById('dataDisplayArea');
+            const dataTitle = document.getElementById('dataTitle');
+            const dataContent = document.getElementById('dataContent');
+
+            dataTitle.innerHTML = `<i class="fas fa-code me-2"></i>API Endpoints Disponibles`;
+            
+            let html = '<div class="row">';
+            apiEndpoints.forEach(endpoint => {
+                const methodClass = getMethodClass(endpoint.method);
+                html += `
+                    <div class="col-md-6 mb-3">
+                        <div class="api-endpoint">
+                            <div class="d-flex align-items-center mb-2">
+                                <span class="badge ${methodClass} me-2">${endpoint.method}</span>
+                                <code class="text-primary">${endpoint.endpoint}</code>
+                            </div>
+                            <p class="mb-0 text-muted">${endpoint.description}</p>
+                        </div>
+                    </div>
+                `;
+            });
+            html += '</div>';
+
+            dataContent.innerHTML = html;
+            dataDisplayArea.style.display = 'block';
+            dataDisplayArea.scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function createTable(data, headers) {
+            let html = `
+                <div class="data-table">
+                    <table class="table table-hover mb-0">
+                        <thead class="table-dark">
+                            <tr>
+                                ${headers.map(header => `<th>${header}</th>`).join('')}
+                            </tr>
+                        </thead>
+                        <tbody>
+            `;
+
+            data.forEach(item => {
+                html += '<tr>';
+                Object.values(item).forEach(value => {
+                    if (typeof value === 'string' && value.includes('@')) {
+                        html += `<td><a href="mailto:${value}" class="text-decoration-none">${value}</a></td>`;
+                    } else if (typeof value === 'string' && value.includes('ACTIVE')) {
+                        html += `<td><span class="badge bg-success status-badge">${value}</span></td>`;
+                    } else if (typeof value === 'string' && value.includes('INACTIVE')) {
+                        html += `<td><span class="badge bg-danger status-badge">${value}</span></td>`;
+                    } else if (typeof value === 'string' && value.includes('PENDING')) {
+                        html += `<td><span class="badge bg-warning status-badge">${value}</span></td>`;
+                    } else if (typeof value === 'string' && value.includes('PROCESSING')) {
+                        html += `<td><span class="badge bg-info status-badge">${value}</span></td>`;
+                    } else if (typeof value === 'string' && value.includes('DELIVERED')) {
+                        html += `<td><span class="badge bg-success status-badge">${value}</span></td>`;
+                    } else if (typeof value === 'number' && value > 100) {
+                        html += `<td><span class="text-success fw-bold">$${value.toFixed(2)}</span></td>`;
+                    } else {
+                        html += `<td>${value}</td>`;
+                    }
+                });
+                html += '</tr>';
+            });
+
+            html += `
+                        </tbody>
+                    </table>
+                </div>
+            `;
+
+            return html;
+        }
+
+        function getEntityTitle(entityType) {
+            const titles = {
+                categories: 'Categorías de Productos',
+                products: 'Catálogo de Productos',
+                customers: 'Clientes Registrados',
+                orders: 'Pedidos del Sistema',
+                orderItems: 'Items de Pedidos'
+            };
+            return titles[entityType] || 'Datos';
+        }
+
+        function getMethodClass(method) {
+            const classes = {
+                'GET': 'bg-success',
+                'POST': 'bg-primary',
+                'PUT': 'bg-warning',
+                'DELETE': 'bg-danger'
+            };
+            return classes[method] || 'bg-secondary';
+        }
+
+        function hideDataDisplay() {
+            document.getElementById('dataDisplayArea').style.display = 'none';
+        }
+
+        // Initialize console focus
+        document.addEventListener('DOMContentLoaded', function() {
+            const sqlInput = document.getElementById('sqlInput');
+            if (sqlInput) {
+                sqlInput.focus();
+            }
+        });
+    </script>
+</body>
+</html>
