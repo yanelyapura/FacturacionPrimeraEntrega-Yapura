@@ -1,4 +1,8 @@
-# 📚 Primera Entrega JPA - Proyecto de Demostración
+# 📚 Sistema de Facturación Empresarial - Proyecto JPA
+
+## 🚀 Demo en Vivo
+
+**🌐 [Ver Aplicación en GitHub Pages](https://yanelyapura.github.io/FacturacionPrimeraEntrega-Yapura/)**
 
 ## 📋 Descripción del Proyecto
 

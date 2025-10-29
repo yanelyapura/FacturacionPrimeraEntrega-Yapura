@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>API Demo - Sistema de Facturación</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <style>
+        .api-card {
+            transition: transform 0.3s ease;
+            border-left: 4px solid #007bff;
+        }
+        .api-card:hover {
+            transform: translateY(-2px);
+        }
+        .method-get { border-left-color: #28a745; }
+        .method-post { border-left-color: #ffc107; }
+        .method-put { border-left-color: #17a2b8; }
+        .method-delete { border-left-color: #dc3545; }
+        .code-block {
+            background-color: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 5px;
+            padding: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+        }
+    </style>
+</head>
+<body>
+    <div class="container py-5">
+        <div class="row">
+            <div class="col-12">
+                <h1 class="display-4 mb-4">
+                    <i class="fas fa-code me-3"></i>
+                    API Demo - Sistema de Facturación
+                </h1>
+                <p class="lead text-muted">
+                    Demostración de las APIs REST disponibles en el sistema de facturación empresarial.
+                </p>
+            </div>
+        </div>
+
+        <div class="row g-4">
+            <!-- Categorías API -->
+            <div class="col-md-6">
+                <div class="card api-card method-get">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tags me-2"></i>
+                            Categorías API
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">GET</span>
+                            <code>/api/categories</code>
+                        </div>
+                        <p>Obtener todas las categorías de productos</p>
+                        <div class="code-block">
+                            <div class="text-success">// Respuesta de ejemplo</div>
+                            [
+                              {
+                                "id": 1,
+                                "name": "Tecnología",
+                                "description": "Productos tecnológicos"
+                              }
+                            ]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Productos API -->
+            <div class="col-md-6">
+                <div class="card api-card method-get">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-box me-2"></i>
+                            Productos API
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">GET</span>
+                            <code>/api/products</code>
+                        </div>
+                        <p>Obtener todos los productos del catálogo</p>
+                        <div class="code-block">
+                            <div class="text-success">// Respuesta de ejemplo</div>
+                            [
+                              {
+                                "id": 1,
+                                "name": "Laptop Gaming",
+                                "price": 1299.99,
+                                "stock": 10,
+                                "category": {
+                                  "id": 1,
+                                  "name": "Tecnología"
+                                }
+                              }
+                            ]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Clientes API -->
+            <div class="col-md-6">
+                <div class="card api-card method-get">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-users me-2"></i>
+                            Clientes API
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">GET</span>
+                            <code>/api/customers</code>
+                        </div>
+                        <p>Obtener todos los clientes registrados</p>
+                        <div class="code-block">
+                            <div class="text-success">// Respuesta de ejemplo</div>
+                            [
+                              {
+                                "id": 1,
+                                "firstName": "Juan",
+                                "lastName": "Pérez",
+                                "email": "juan@email.com"
+                              }
+                            ]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Pedidos API -->
+            <div class="col-md-6">
+                <div class="card api-card method-get">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-shopping-cart me-2"></i>
+                            Pedidos API
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">GET</span>
+                            <code>/api/orders</code>
+                        </div>
+                        <p>Obtener todos los pedidos del sistema</p>
+                        <div class="code-block">
+                            <div class="text-success">// Respuesta de ejemplo</div>
+                            [
+                              {
+                                "id": 1,
+                                "orderNumber": "ORD-001",
+                                "status": "PENDING",
+                                "customer": {
+                                  "id": 1,
+                                  "firstName": "Juan"
+                                }
+                              }
+                            ]
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Crear Pedido API -->
+            <div class="col-md-6">
+                <div class="card api-card method-post">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-plus me-2"></i>
+                            Crear Pedido
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge bg-warning me-2">POST</span>
+                            <code>/api/orders</code>
+                        </div>
+                        <p>Crear un nuevo pedido en el sistema</p>
+                        <div class="code-block">
+                            <div class="text-success">// Request Body</div>
+                            {
+                              "customerId": 1,
+                              "shippingAddress": "Calle Principal 123",
+                              "items": [
+                                {
+                                  "productId": 1,
+                                  "quantity": 2
+                                }
+                              ]
+                            }
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Consultas Personalizadas -->
+            <div class="col-md-6">
+                <div class="card api-card method-get">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-search me-2"></i>
+                            Consultas Personalizadas
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <span class="badge bg-success me-2">GET</span>
+                            <code>/api/products/search</code>
+                        </div>
+                        <p>Consultas avanzadas con filtros</p>
+                        <div class="code-block">
+                            <div class="text-success">// Parámetros de consulta</div>
+                            ?categoryId=1&minPrice=100&maxPrice=500&inStock=true
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información Técnica -->
+        <div class="row mt-5">
+            <div class="col-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-info-circle me-2"></i>
+                            Información Técnica
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <h6>Características de la API</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>RESTful design</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>JSON responses</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Error handling</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Validation</li>
+                                </ul>
+                            </div>
+                            <div class="col-md-6">
+                                <h6>Tecnologías Utilizadas</h6>
+                                <ul class="list-unstyled">
+                                    <li><i class="fas fa-check text-success me-2"></i>Spring Boot</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Spring Data JPA</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Hibernate</li>
+                                    <li><i class="fas fa-check text-success me-2"></i>Bean Validation</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="row mt-5">
+            <div class="col-12 text-center">
+                <hr>
+                <p class="text-muted">
+                    <i class="fas fa-code me-2"></i>
+                    Desarrollado por <strong>Yanel Yapura</strong> | 
+                    <a href="https://github.com/yanelyapura" target="_blank" class="text-decoration-none">
+                        <i class="fab fa-github me-1"></i>GitHub
+                    </a> |
+                    <a href="https://linkedin.com/in/yanelyapura/" target="_blank" class="text-decoration-none">
+                        <i class="fab fa-linkedin me-1"></i>LinkedIn
+                    </a>
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
