@@ -50,7 +50,7 @@ jobs:
       
     - name: Copy static files to docs
       run: |
-        cp index.html docs/
+        cp home.html docs/
         cp api-demo.html docs/
         cp demo.html docs/
         cp README.md docs/ || echo "README.md not found"
