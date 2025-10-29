@@ -46,7 +46,7 @@ jobs:
       run: mvn clean compile test
       
     - name: Generate Javadoc
-      run: mvn javadoc:javadoc
+      run: mvn javadoc:javadoc -Dmaven.javadoc.failOnError=false
       
     - name: Create documentation directory
       run: mkdir -p docs

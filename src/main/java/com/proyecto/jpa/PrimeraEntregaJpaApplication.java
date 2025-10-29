@@ -6,10 +6,10 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 /**
  * Clase principal de la aplicación Spring Boot con JPA.
  * 
- * @SpringBootApplication es una anotación conveniente que combina:
- * - @Configuration: marca la clase como fuente de definiciones de beans
- * - @EnableAutoConfiguration: habilita la auto-configuración de Spring Boot
- * - @ComponentScan: escanea componentes, configuraciones y servicios en el paquete actual
+ * SpringBootApplication es una anotación conveniente que combina:
+ * - Configuration: marca la clase como fuente de definiciones de beans
+ * - EnableAutoConfiguration: habilita la auto-configuración de Spring Boot
+ * - ComponentScan: escanea componentes, configuraciones y servicios en el paquete actual
  * 
  * Esta aplicación demuestra el uso de JPA (Java Persistence API) con Hibernate
  * para mapear objetos Java a tablas de base de datos relacionales.

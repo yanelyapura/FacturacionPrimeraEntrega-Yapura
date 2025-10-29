@@ -36,7 +36,7 @@
  *   <li>Campos transitorios (@Transient)</li>
  * </ul>
  * 
- * @see javax.persistence
+ * @see jakarta.persistence
  * @see org.springframework.data.jpa
  * @author Proyecto JPA
  * @version 1.0.0
