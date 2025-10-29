@@ -48,14 +48,11 @@ jobs:
     - name: Generate Javadoc
       run: mvn javadoc:javadoc -Dmaven.javadoc.failOnError=false
       
-    - name: Create documentation directory
-      run: mkdir -p docs
-      
-    - name: Copy static files first
+    - name: Copy static files to docs
       run: |
         cp index.html docs/
         cp README.md docs/ || echo "README.md not found"
-        cp docs/api-demo.html docs/ || echo "api-demo.html not found"
+        # Los archivos api-demo.html ya están en docs/ desde el repositorio
       
     - name: Copy Javadoc to docs
       run: cp -r target/site/apidocs/* docs/ || echo "Javadoc not generated, continuing..."
