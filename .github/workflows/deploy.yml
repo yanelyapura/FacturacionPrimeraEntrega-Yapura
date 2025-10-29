@@ -51,13 +51,14 @@ jobs:
     - name: Create documentation directory
       run: mkdir -p docs
       
-    - name: Copy Javadoc to docs
-      run: cp -r target/site/apidocs/* docs/ || echo "Javadoc not generated, continuing..."
-      
-    - name: Copy static files
+    - name: Copy static files first
       run: |
         cp index.html docs/
         cp README.md docs/ || echo "README.md not found"
+        cp docs/api-demo.html docs/ || echo "api-demo.html not found"
+      
+    - name: Copy Javadoc to docs
+      run: cp -r target/site/apidocs/* docs/ || echo "Javadoc not generated, continuing..."
         
     - name: Upload build artifacts
       uses: actions/upload-artifact@v4
